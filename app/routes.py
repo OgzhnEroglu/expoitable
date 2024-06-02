@@ -52,7 +52,7 @@ def zaafiyet1():
     return render_template('zaafiyet1.html')
 
 @app.route('/zaafiyet2')
-def zaafiyet1():
+def zaafiyet2():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     return render_template('zaafiyet2.html')
