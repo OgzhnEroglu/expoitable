@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, url_for, flash, session
 
 # Mock user data
 users = {
-    "admin": "password123"
+    "admin": {"password123": "password123", "role": "admin"}
 }
 
 @app.route('/')
@@ -56,3 +56,35 @@ def zaafiyet2():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     return render_template('zaafiyet2.html')
+
+
+# Yetkilendirme için basit bir rol kontrolü
+def is_admin(username):
+    return users[username]["role"] == "admin"
+
+@app.route('/dashboard')
+def dashboard():
+    if 'username' in session:
+        if is_admin(session['username']):
+            return "Hoş geldiniz, {}! Yönetici paneline erişiminiz var.".format(session['username'])
+        else:
+            return "Hoş geldiniz, {}! Bu, bir kullanıcı panelidir.".format(session['username'])
+    return redirect(url_for('login'))  
+
+@app.route('/fetch', methods=['POST'])
+def fetch_data():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    
+    url = request.form['url']
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return render_template_string("<pre>{{ data }}</pre>", data=response.text)
+        else:
+            return "Failed to fetch data"
+    except Exception as e:
+        return f"An error occurred: {e}"
+
+if __name__ == '__main__':
+    app.run(debug=True)
