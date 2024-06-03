@@ -70,3 +70,21 @@ def dashboard():
         else:
             return "Hoş geldiniz, {}! Bu, bir kullanıcı panelidir.".format(session['username'])
     return redirect(url_for('login'))  
+
+@app.route('/fetch', methods=['POST'])
+def fetch_data():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    
+    url = request.form['url']
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return render_template_string("<pre>{{ data }}</pre>", data=response.text)
+        else:
+            return "Failed to fetch data"
+    except Exception as e:
+        return f"An error occurred: {e}"
+
+if __name__ == '__main__':
+    app.run(debug=True)
