@@ -1,0 +1,45 @@
+###Serdar software and data integrity failures ###
+
+from flask import Flask, request, flash, redirect, url_for, render_template
+from werkzeug.utils import secure_filename
+import os
+
+app = Flask(__name__)
+app.secret_key = 'supersecretkey'  # Gizli anahtar, Flash mesajları için gerekli
+app.config['UPLOAD_FOLDER'] = '/path/to/the/uploads'  # Dosyaların yükleneceği dizin
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # Maksimum dosya boyutu: 2 MB
+
+# İzin verilen dosya türleri
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'pdf'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        # Dosya kontrolü
+        if 'file' not in request.files:
+            flash('Dosya seçilmedi.')
+            return redirect(request.url)
+        
+        file = request.files['file']
+        
+        if file.filename == '':
+            flash('Dosya seçilmedi.')
+            return redirect(request.url)
+        
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            flash(f'Dosya başarıyla yüklendi: {filename}')
+            return redirect(url_for('upload_file'))
+        else:
+            flash('İzin verilmeyen dosya türü.')
+            return redirect(request.url)
+
+    return render_template('upload.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
