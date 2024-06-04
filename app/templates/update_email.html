@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+</head>
+<body>
+    <h1>User Management</h1>
+
+    <h2>Get User Information</h2>
+    <form id="getUserForm">
+        <label for="userId">User ID:</label>
+        <input type="text" id="userId" name="userId" required>
+        <button type="submit">Get User Info</button>
+    </form>
+    <pre id="userInfo"></pre>
+
+    <h2>Update User Email</h2>
+    <form id="updateEmailForm">
+        <label for="updateUserId">User ID:</label>
+        <input type="text" id="updateUserId" name="updateUserId" required>
+        
+        <label for="newEmail">New Email:</label>
+        <input type="email" id="newEmail" name="newEmail" required>
+        
+        <button type="submit">Update Email</button>
+    </form>
+    <pre id="updateResult"></pre>
+
+    <script>
+        // Get User Information
+        document.getElementById('getUserForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const userId = document.getElementById('userId').value;
+            fetch(`/api/user/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('userInfo').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        // Update User Email
+        document.getElementById('updateEmailForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const updateUserId = document.getElementById('updateUserId').value;
+            const newEmail = document.getElementById('newEmail').value;
+
+            const userData = {
+                user_id: updateUserId,
+                email: newEmail
+            };
+
+            fetch('/api/user/update_email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('updateResult').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
