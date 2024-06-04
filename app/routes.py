@@ -107,6 +107,30 @@ def fetch_data():
     except Exception as e:
         return f"An error occurred: {e}"
 
+#IDOR
+@app.route('/api/user/<user_id>', methods=['GET'])
+def get_user(user_id):
+    user_id = int(user_id)  # Ensure user_id is an integer
+    if user_id in user_profiles:
+        return jsonify(user_profiles[user_id]), 200
+    else:
+        return jsonify({'error': 'User not found'}), 404
+
+@app.route('/api/user/update_email', methods=['POST'])
+def update_email():
+    data = request.json
+    user_id = int(data.get('user_id'))  # Ensure user_id is an integer
+    new_email = data.get('email')
+    
+    if user_id and new_email:
+        if user_id in user_profiles:
+            user_profiles[user_id]['email'] = new_email
+            return jsonify({'message': 'Email updated successfully'}), 200
+        else:
+            return jsonify({'error': 'User not found'}), 404
+    else:
+        return jsonify({'error': 'Invalid request'}), 400
+
 if __name__ == '__main__':
     app.run(debug=True)
 
