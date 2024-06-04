@@ -11,17 +11,3 @@ logging.basicConfig(filename=log_file, level=logging.INFO, format='[%(asctime)s]
 def log_login(username, password, ip_address, success=True):
     status = "başarılı" if success else "başarısız"
     logging.info(f'Giriş {status} - Kullanıcı: {username}, Şifre: {password}, IP: {ip_address}')
-
-@app.route('/')
-def index():
-    # Kullanıcı girişi başarılıysa
-    log_login("john_doe", "123456", "192.168.1.10", success=True)
-
-    # Kullanıcı girişi başarısızsa
-    log_login("jane_smith", "password123", "192.168.1.20", success=False)
-
-    return 'Hello, World!'
-
-if __name__ == '__main__':
-    app.run(debug=True)
-	
