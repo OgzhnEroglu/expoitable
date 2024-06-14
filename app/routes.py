@@ -38,6 +38,7 @@ def login():
             flash('Invalid username or password', 'danger')
     return render_template('login.html')
 
+
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
@@ -45,11 +46,31 @@ def logout():
     flash('You were logged out.', 'success')
     return redirect(url_for('login'))
 
-@app.route('/zaafiyet1')
+@app.route('/zaafiyet1', methods=['GET', 'POST']) ###CANISHERO SQL INJ. 
 def zaafiyet1():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        username = request.form['username']
+        
+        conn = sqlite3.connect('example.db')
+        c = conn.cursor()
+        query = f"SELECT * FROM users WHERE username = '{username}'"
+        print("Executing query:", query)  # Bu sadece gösterim amaçlıdır; prodüksiyonda kaldırılmalıdır
+        c.execute(query)
+        users = c.fetchall()
+        
+        conn.close()
+        
+        if users:
+            return f"Found users: {users}"
+        else:
+            return "No users found!"
+    
     return render_template('zaafiyet1.html')
+
+
 
 @app.route('/zaafiyet2')
 def zaafiyet2():
@@ -70,6 +91,3 @@ def dashboard():
         else:
             return "Hoş geldiniz, {}! Bu, bir kullanıcı panelidir.".format(session['username'])
     return redirect(url_for('login'))  
-
-if __name__ == '__main__':
-    app.run(debug=True)
