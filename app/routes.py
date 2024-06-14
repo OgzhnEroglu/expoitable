@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session 
 
 # Mock user data
 users = {
@@ -70,3 +70,6 @@ def dashboard():
         else:
             return "Hoş geldiniz, {}! Bu, bir kullanıcı panelidir.".format(session['username'])
     return redirect(url_for('login'))  
+
+if __name__ == '__main__':
+    app.run(debug=True)
